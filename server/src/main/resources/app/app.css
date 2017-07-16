@@ -1,0 +1,25 @@
+body {
+    background-color: #ededed;
+}
+
+.panel-default, .panel-default>.panel-heading, .panel-default>.panel-footer {
+    background-color: #fff1cc;
+    color: black;
+}
+
+.panel {
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.no-gutter > [class*='col-'] {
+    padding-right:0;
+    padding-left:0;
+}
+
+.settings-row {
+    margin-bottom: 1%;
+}
+
+canvas {
+    border: 1px black solid;
+}

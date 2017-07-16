@@ -1,0 +1,10 @@
+# Mac
+*.DS_Store
+
+# Intellij
+*.idea/
+*.iml
+*.iws
+
+# SBT
+*target/

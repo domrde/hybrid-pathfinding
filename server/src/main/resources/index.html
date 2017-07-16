@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pathfinding</title>
+    <link href="/app/libs/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/app/app.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid">
+
+    <!-- Top description bar -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p id="description">Placeholder</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results and settings -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">Results</div>
+                <div class="panel-body">
+                    <canvas id="pathfindingCanvas" width="770" height="400"></canvas>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <input type="button" id="placeObstacles" value="Place obstacles">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="button" id="restoreDefaults" value="Restore defaults">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-3">
+                            Seconds to wait result:
+                        </div>
+                        <div class="col-md-1">
+                            <input type="number" id="calculationTimeout" min="1" max="20" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="button" id="submit" value="Submit">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Path restoration settings</div>
+                <div class="panel-body">
+                    <div class="row settings-row">
+                        <div class="col-md-4">Angle of search:</div>
+                        <div class="col-md-7">
+                            <input type="range" id="angleOfSearchInput" value="70" min="1" max="180"
+                                   oninput="angleOfSearchOutput.value = angleOfSearchInput.value">
+                        </div>
+                        <div class="col-md-1">
+                            <output id="angleOfSearchOutput">70</output>
+                        </div>
+                    </div>
+
+                    <div class="row settings-row">
+                        <div class="col-md-4">Path step:</div>
+                        <div class="col-md-7">
+                            <input type="range" id="pathStepInput" value="0.35" min="0.1" max="5.0" step="0.01"
+                                   oninput="pathStepOutput.value = pathStepInput.value">
+                        </div>
+                        <div class="col-md-1">
+                            <output id="pathStepOutput">0.35</output>
+                        </div>
+                    </div>
+
+                    <div class="row settings-row">
+                        <div class="col-md-4">Delta to finish:</div>
+                        <div class="col-md-7">
+                            <input type="range" id="deltaToFinishInput" value="1.0" min="0.1" max="5.0" step="0.01"
+                                   oninput="deltaToFinishOutput.value = deltaToFinishInput.value">
+                        </div>
+                        <div class="col-md-1">
+                            <output id="deltaToFinishOutput">1.0</output>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="panel panel-default">
+                <div class="panel-heading">SVM settings</div>
+                <div class="panel-body">
+                    <div class="col-md-6">
+                        <div class="row settings-row">SVM type:</div>
+                        <div class="row settings-row">
+                            <input type="radio" name="svm" value="0" checked> C_SVC<br>
+                            <input type="radio" name="svm" value="1"> NU_SVC<br>
+                            <input type="radio" name="svm" value="3"> EPSILON_SVR<br>
+                            <input type="radio" name="svm" value="4"> NU_SVR<br>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row settings-row">Kernel:</div>
+                        <div class="row settings-row">
+                            <input type="radio" name="kernel" value="0"> Linear<br>
+                            <input type="radio" name="kernel" value="1"> Poly<br>
+                            <input type="radio" name="kernel" value="2" checked> RBF<br>
+                            <input type="radio" name="kernel" value="3"> Sigmoid<br>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12"></div>
+
+                    <div class="row settings-row">
+                        <div class="col-md-4">Gamma exponent:</div>
+                        <div class="col-md-7">
+                            <input type="range" id="gammaInput" value="0" min="-13" max="13" step="1"
+                                   oninput="gammaOutput.value = gammaInput.value">
+                        </div>
+                        <div class="col-md-1">
+                            2e
+                            <output id="gammaOutput">1.0</output>
+                        </div>
+                    </div>
+
+                    <div class="row settings-row">
+                        <div class="col-md-4">Cost exponent:</div>
+                        <div class="col-md-7">
+                            <input type="range" id="costInput" value="11" min="-13" max="13" step="1"
+                                   oninput="costOutput.value = costInput.value">
+                        </div>
+                        <div class="col-md-1">
+                            2e
+                            <output id="costOutput">1.0</output>
+                        </div>
+                    </div>
+
+                    <div class="row settings-row">
+                        <div class="col-md-4">Eps exponent:</div>
+                        <div class="col-md-7">
+                            <input type="range" id="epsInput" value="-1" min="-13" max="13" step="1"
+                                   oninput="epsOutput.value = epsInput.value">
+                        </div>
+                        <div class="col-md-1">
+                            2e
+                            <output id="epsOutput">1.0</output>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+
+сделать сетку, в нее элекменты
+
+.app.css ->
+
+        input.ui-inline-helper,
+        output.ui-inline-helper {
+            display: inline-block;
+            width: auto;
+        }
+
+.index.html ->
+
+       <div class="row">
+            <div class="col-md-5">
+                Angle of search:
+            </div>
+            <div class="col-md-7">
+                <input type="range" class="ui-inline-helper" id="angleOfSearchInput" value="70" min="1" max="180"
+                       oninput="angleOfSearchOutput.value = angleOfSearchInput.value">
+                <output class="ui-inline-helper" id="angleOfSearchOutput">70</output>
+            </div>
+        </div>
+
+http://getbootstrap.com/css/#grid
+
+-->
+
+<script type="text/javascript" src="/app/client-fastopt.js"></script>
+<script>
+    client.Client().main();
+</script>
+
+</body>
+</html>
