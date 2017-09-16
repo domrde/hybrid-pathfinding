@@ -8,3 +8,5 @@
 
 # SBT
 *target/
+
+server/src/main/resources/app/client-fastopt.js
