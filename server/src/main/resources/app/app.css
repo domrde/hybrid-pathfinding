@@ -1,25 +1,16 @@
-body {
-    background-color: #ededed;
+div[class^='col'], div[class*=' col']{
+    padding: 2px;
 }
 
-.panel-default, .panel-default>.panel-heading, .panel-default>.panel-footer {
-    background-color: #fff1cc;
-    color: black;
+.container {
+    max-width: 100%;
 }
 
-.panel {
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-}
-
-.no-gutter > [class*='col-'] {
-    padding-right:0;
-    padding-left:0;
-}
-
-.settings-row {
-    margin-bottom: 1%;
+.input-group span {
+    display: inline-block;
 }
 
 canvas {
     border: 1px black solid;
+    max-width: 100%;
 }

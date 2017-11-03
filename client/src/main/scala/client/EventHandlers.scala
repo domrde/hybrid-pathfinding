@@ -7,7 +7,7 @@ import scala.scalajs.js.annotation.JSExport
 
 @JSExport
 object EventHandlers {
-  def setHandlers() = {
+  def initHandlers() = {
     dom.document.getElementById("restoreDefaults").asInstanceOf[Input].onmousedown = (e: dom.raw.Event) => InputCollector.restoreDefaults()
 
     dom.document.getElementById("placeObstacles").asInstanceOf[Input].onmousedown = (e: dom.raw.Event) => CanvasWorker.shuffleObstacles()

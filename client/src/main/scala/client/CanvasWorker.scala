@@ -3,7 +3,7 @@ package client
 import client.Client._
 import common.CommonObjects.{Obstacle, Path, PathWithAngles, Point, PointWithAngle, Result, distance}
 import org.scalajs.dom
-import org.scalajs.dom.html.Canvas
+import org.scalajs.dom.html.{Canvas, Div}
 
 import scala.scalajs.js.annotation.JSExport
 import scala.util.Random
@@ -17,7 +17,7 @@ object CanvasWorker {
   private val pathColor = "rgb(242, 186, 77)"
   private val smoothPathColor = "brown"
   private val positiveExampleColor = "rgb(252, 121, 79)"
-  private val negativeExampleColor = "rgb(63, 81, 101)"
+  private val negativeExampleColor = "rgb(63, sbt 81, 101)"
 
   private var canvas: Canvas = _
   private var context: dom.CanvasRenderingContext2D = _
@@ -26,7 +26,11 @@ object CanvasWorker {
   var finish: Point = _
 
   def init() = {
-    canvas = dom.document.getElementById("pathfindingCanvas").asInstanceOf[Canvas]
+    val canvasCard = dom.document.getElementById("canvasCard").asInstanceOf[Div]
+    canvas = dom.document.createElement("canvas").asInstanceOf[Canvas]
+    canvasCard.appendChild(canvas)
+    canvas.width = canvasCard.clientWidth
+    canvas.height = 3 * canvasCard.clientHeight
     context = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
     shuffleObstacles()
   }
@@ -56,10 +60,10 @@ object CanvasWorker {
     start = startPoints._1
     finish = startPoints._2
 
-    draw()
+    redraw()
   }
 
-  def draw(): Unit = {
+  def redraw(): Unit = {
     val tileHeight = canvas.height / dims.y
     val tileWidth = canvas.width / dims.x
     clearCanvas()

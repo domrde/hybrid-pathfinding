@@ -16,9 +16,9 @@ object Client {
 
   dom.window.onload = _ => {
     CanvasWorker.init()
-    EventHandlers.setHandlers()
+    EventHandlers.initHandlers()
     InputCollector.init()
-    CanvasWorker.draw()
+    CanvasWorker.redraw()
   }
 
   @JSExport
