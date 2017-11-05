@@ -12,8 +12,7 @@ import com.typesafe.config.ConfigFactory
 import common.CommonObjects._
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success, Try}
 
 object Protocols extends DefaultJsonProtocol {
@@ -59,16 +58,10 @@ object WebInterface extends App {
     } ~ post {
       path("pathfind") {
         entity(as[Configuration]) { configuration =>
-          limitExecutionTime(configuration.settings.calculationTimeout) {
-            calculatePath(configuration)
-          }
+          calculatePath(configuration)
         }
       }
     }
-  }
-
-  def limitExecutionTime[R](timeoutMillis: Int)(block: => R): R = {
-    Await.result(Future(block), timeoutMillis.millis)
   }
 
   def calculatePath(configuration: Configuration): StandardRoute = {

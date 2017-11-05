@@ -3,7 +3,7 @@ package server
 import java.util.concurrent.Executors
 
 import common.CommonObjects
-import common.CommonObjects._
+import common.CommonObjects.{Configuration, _}
 import libsvm._
 import libsvm.svm_parameter._
 
@@ -167,7 +167,8 @@ object Learning {
     val smoothPath = path.path
 
     val pointOutsideField = smoothPath.exists { case PointWithAngle(point, _) =>
-      point.x < 0 || point.y < 0 || point.x > config.dims.x || point.y > config.dims.y }
+      point.x < 0 || point.y < 0 || point.x > config.dims.x || point.y > config.dims.y
+    }
 
     val isAwayFromStart = distance(smoothPath.head.p, config.start) > eps && distance(smoothPath.last.p, config.start) > eps
 
@@ -178,18 +179,20 @@ object Learning {
     isCorrect
   }
 
-  private def runSVM(obstacles: List[Example], dims: Point, start: Point, finish: Point, pathStep: Double, angleOfSearch: Double, deltaToFinish: Double): List[Future[RunResults]] = {
+  private def runSVM(obstacles: List[Example], configuration: Configuration): List[Future[RunResults]] = {
 
     val radialModels =
-      List(2e-1).map { eps =>
+      List(configuration.settings.eps).map { eps =>
         Future {
-          trainSvmModel(svmType = C_SVC, kernel = RBF, field = obstacles, gamma = 1, cost = 2e11, eps = eps)
+          trainSvmModel(svmType = C_SVC, kernel = RBF, field = obstacles, gamma = configuration.settings.gamma,
+            cost = configuration.settings.cost, eps = eps)
         }
       }
 
     radialModels.map { modelFuture =>
       modelFuture.map { model =>
-        RunResults(buildPath(model, pathStep, angleOfSearch / 2.0, start, finish, dims, deltaToFinish), "")
+        RunResults(buildPath(model, configuration.settings.pathStep, configuration.settings.angleOfSearch / 2.0,
+          configuration.start, configuration.finish, configuration.dims, configuration.settings.deltaToFinish), "")
       }
     }
   }
@@ -233,11 +236,10 @@ object Learning {
         Example(y / height, x / width, c, r)
       }
 
-      val results = Learning.runSVM(normalized, configuration.dims, configuration.start, configuration.finish,
-        configuration.settings.pathStep, configuration.settings.angleOfSearch, configuration.settings.deltaToFinish)
+      val results = Learning.runSVM(normalized, configuration)
 
       val paths =
-        Await.result(Future.sequence(results), 220.second)
+        Await.result(Future.sequence(results), configuration.settings.calculationTimeout.millis)
           .filter(_.paths.nonEmpty)
           .flatMap { runResults =>
             runResults.paths.map { points =>

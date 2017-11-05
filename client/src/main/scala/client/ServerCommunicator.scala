@@ -12,7 +12,7 @@ class ServerCommunicator(clientSettings: ClientSettings, inputCollector: InputCo
 
   import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-  def calculateAndDrawPath(): Unit = {
+  def requestPathCalculation(): Unit = {
     val settings = inputCollector.getCurrentSettings()
     val configuration = Configuration(clientSettings.dims, clientSettings.start, clientSettings.finish, clientSettings.obstacles, settings)
 

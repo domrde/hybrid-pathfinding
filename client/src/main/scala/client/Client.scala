@@ -27,7 +27,7 @@ object Client {
       (e: dom.raw.Event) => { clientSettings.shuffleObstacles(); canvasWorker.redraw() }
 
     dom.document.getElementById("submit").asInstanceOf[Input].onmousedown =
-      (e: dom.raw.Event) => serverCommunicator.calculateAndDrawPath()
+      (e: dom.raw.Event) => serverCommunicator.requestPathCalculation()
 
     canvasWorker.redraw()
   }

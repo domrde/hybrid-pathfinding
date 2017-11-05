@@ -40,9 +40,7 @@ object Patcher {
 
   def mapObstaclesToPatches(dims: Point, rawObstacles: List[Obstacle]): List[MapPatch] = {
 
-    val grisStepY = dims.y / 10.0
-    val grisStepX = dims.x / 10.0
-    val maxDim = Math.max(grisStepX, grisStepY)
+    val gridStep = 0.5
 
     def checkCandidate(polygon: Polygon, obstacles: List[Obstacle]): Boolean = {
       val (min, max) = polygon.getBoundingBox
@@ -50,8 +48,8 @@ object Patcher {
     }
 
     val patches =
-      (0.0 to dims.y by grisStepY).toList.sliding(2).flatMap { case horA :: horB :: Nil =>
-        (0.0 to dims.x by grisStepX).toList.sliding(2).flatMap { case verA :: verB :: Nil =>
+      (0.0 to dims.y by gridStep).toList.sliding(2).flatMap { case horA :: horB :: Nil =>
+        (0.0 to dims.x by gridStep).toList.sliding(2).flatMap { case verA :: verB :: Nil =>
           val polygon = Polygon(List(Point(horA, verA), Point(horA, verB), Point(horB, verB), Point(horB, verA)))
           if (checkCandidate(polygon, rawObstacles)) Some(MapPatch(-1, polygon.points, polygon.centroid)) else None
         }
@@ -59,7 +57,7 @@ object Patcher {
 
     patches.foreach { a =>
       patches.foreach { b =>
-        if (a.centroid != b.centroid && distance(a.centroid, b.centroid) < (maxDim + 0.05)) {
+        if (a.centroid != b.centroid && distance(a.centroid, b.centroid) < (gridStep + 0.05)) {
           a.addExit(b)
           b.addExit(a)
         }

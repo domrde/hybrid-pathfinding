@@ -30,9 +30,9 @@ class InputCollector {
     val pathStep = inputs.pathStep.value.toDouble
     val deltaToFinish = inputs.deltaToFinish.value.toDouble
 
-    val gamma = inputs.gamma.value.toDouble
-    val cost = inputs.cost.value.toDouble
-    val eps = inputs.eps.value.toDouble
+    val gamma = 2.0 * Math.exp(inputs.gamma.value.toDouble)
+    val cost = 2.0 * Math.exp(inputs.cost.value.toDouble)
+    val eps = 2.0 * Math.exp(inputs.eps.value.toDouble)
 
     val svmType = inputs.svmType.value.toInt
     val svmKernel = inputs.kernelType.value.toInt
@@ -56,7 +56,7 @@ class InputCollector {
 
     inputs.inputs.foreach { input =>
       val customEvent = dom.document.createEvent("Event")
-      customEvent.initEvent("change", canBubbleArg = true, cancelableArg = true)
+      customEvent.initEvent("input", canBubbleArg = true, cancelableArg = true)
       input.dispatchEvent(customEvent)
     }
   }
