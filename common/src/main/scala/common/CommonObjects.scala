@@ -1,7 +1,7 @@
 package common
 
 import scala.language.implicitConversions
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
+import scala.scalajs.js.annotation.JSExportAll
 
 @JSExportAll
 object CommonObjects {
@@ -23,7 +23,9 @@ object CommonObjects {
 
   @JSExportAll
   case class Point(var y: Double, var x: Double) {
-    def update(p: Point): Unit = { x = p.x; y = p.y }
+    def update(p: Point): Unit = {
+      x = p.x; y = p.y
+    }
   }
 
   @JSExportAll
@@ -31,8 +33,9 @@ object CommonObjects {
 
   @JSExportAll
   case class Path(path: List[Point], color: String)
+
   @JSExportAll
-  case class PathWithAngles(path: List[PointWithAngle], color: String)
+  case class PathWithAngles(path: List[PointWithAngle], color: String, pathStep: Double, angleOfSearch: Double)
 
   @JSExportAll
   case class MapPatch(var id: Int, coordinates: List[Point], centroid: Point, var exits: Set[Int] = Set.empty) {
@@ -41,11 +44,13 @@ object CommonObjects {
 
   @JSExportAll
   case class InputSettings(calculationTimeout: Int, angleOfSearch: Double, pathStep: Double,
-                                 deltaToFinish: Double, svmType: Int, kernelType: Int, gamma: Double,
-                                 cost: Double, eps: Double)
+                           deltaToFinish: Double, svmType: Int, kernelType: Int, gamma: Double,
+                           cost: Double, eps: Double)
 
   @JSExportAll
   case class Configuration(dims: Point, start: Point, finish: Point, obstacles: List[Obstacle], settings: InputSettings)
+
   @JSExportAll
   case class Result(smoothPath: PathWithAngles, roughPath: Path, patches: List[MapPatch], examples: List[Example])
+
 }

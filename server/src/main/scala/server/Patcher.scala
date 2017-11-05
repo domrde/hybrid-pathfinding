@@ -2,11 +2,6 @@ package server
 
 import common.CommonObjects._
 
-import scala.collection.parallel.mutable.ParArray
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
-
 /**
   * Created by dda on 19.04.17.
   *

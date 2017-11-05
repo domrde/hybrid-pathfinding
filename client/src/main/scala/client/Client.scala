@@ -1,42 +1,38 @@
 package client
 
+import client.input.InputCollector
 import common.CommonObjects._
 import org.scalajs.dom
+import org.scalajs.dom.html.Input
 
 import scala.scalajs.js.annotation.JSExport
-import scala.util.Success
 
 @JSExport
 object Client {
-  import dom.ext._
-
-  import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-
-  val dims = Point(10.0, 20.0)
 
   dom.window.onload = _ => {
-    CanvasWorker.init()
-    EventHandlers.initHandlers()
-    InputCollector.init()
-    CanvasWorker.redraw()
+    val clientSettings = new ClientSettings()
+    val canvasWorker = new CanvasWorker(clientSettings)
+    val inputCollector = new InputCollector()
+
+    val successfulServerResponseHandler =
+      (result: Result) => canvasWorker.draw(result)
+
+    val serverCommunicator = new ServerCommunicator(clientSettings, inputCollector, successfulServerResponseHandler)
+
+    dom.document.getElementById("restoreDefaults").asInstanceOf[Input].onmousedown =
+      (e: dom.raw.Event) => inputCollector.restoreDefaults()
+
+    dom.document.getElementById("placeObstacles").asInstanceOf[Input].onmousedown =
+      (e: dom.raw.Event) => { clientSettings.shuffleObstacles(); canvasWorker.redraw() }
+
+    dom.document.getElementById("submit").asInstanceOf[Input].onmousedown =
+      (e: dom.raw.Event) => serverCommunicator.calculateAndDrawPath()
+
+    canvasWorker.redraw()
   }
 
   @JSExport
   def main(): Unit = {
-  }
-
-  def calculateAndDrawPath(): Unit = {
-    println("Sending data")
-
-    Ajax.post(
-      url = "http://localhost:8080/pathfind",
-      data = upickle.default.write(Configuration(dims, CanvasWorker.start, CanvasWorker.finish, CanvasWorker.obstacles,
-        InputCollector.getCurrentSettings())),
-      headers = Map("Content-Type" -> "application/json")
-    ).onComplete {
-      case Success(value) if value.status == 200 =>
-        CanvasWorker.draw(upickle.default.read[Result](value.responseText))
-      case _ =>
-    }
   }
 }

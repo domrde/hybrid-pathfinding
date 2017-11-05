@@ -1,7 +1,6 @@
 package server
 
-import common.CommonObjects.{Obstacle, Point}
-import server.Patcher.Polygon
+import common.CommonObjects.Point
 
 object InputMapper {
 

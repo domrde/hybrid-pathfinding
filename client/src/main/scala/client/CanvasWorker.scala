@@ -1,15 +1,13 @@
 package client
 
-import client.Client._
-import common.CommonObjects.{Obstacle, Path, PathWithAngles, Point, PointWithAngle, Result, distance}
+import common.CommonObjects.{Obstacle, Path, PathWithAngles, Point, PointWithAngle, Result}
 import org.scalajs.dom
 import org.scalajs.dom.html.{Canvas, Div}
 
 import scala.scalajs.js.annotation.JSExport
-import scala.util.Random
 
 @JSExport
-object CanvasWorker {
+class CanvasWorker(clientSettings: ClientSettings) {
 
   private val backgroundColor = "white"
   private val obstaclesColor = "rgb(48, 110, 105)"
@@ -19,61 +17,29 @@ object CanvasWorker {
   private val positiveExampleColor = "rgb(252, 121, 79)"
   private val negativeExampleColor = "rgb(63, sbt 81, 101)"
 
-  private var canvas: Canvas = _
-  private var context: dom.CanvasRenderingContext2D = _
-  var obstacles: List[Obstacle] = _
-  var start: Point = _
-  var finish: Point = _
-
-  def init() = {
+  private def createCanvas(): Canvas = {
     val canvasCard = dom.document.getElementById("canvasCard").asInstanceOf[Div]
-    canvas = dom.document.createElement("canvas").asInstanceOf[Canvas]
+    val canvas = dom.document.createElement("canvas").asInstanceOf[Canvas]
     canvasCard.appendChild(canvas)
     canvas.width = canvasCard.clientWidth
     canvas.height = 3 * canvasCard.clientHeight
-    context = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
-    shuffleObstacles()
+    canvas
   }
 
-  def randomStartPoints(obstacles: List[Obstacle]): (Point, Point) = {
-    def closeToObstacle(point: Point): Boolean = {
-      obstacles.exists(obs => distance(obs, point) < 1.0)
-    }
-
-    var start = Utils.randomPoint(dims)
-    while (closeToObstacle(start)) {
-      start = Utils.randomPoint(dims)
-    }
-
-    var finish = Utils.randomPoint(dims)
-    while (closeToObstacle(finish) || distance(start, finish) < 4.0) {
-      finish = Utils.randomPoint(dims)
-    }
-
-    (start, finish)
-  }
-
-  def shuffleObstacles(): Unit = {
-    obstacles = (1 to (Random.nextInt(10) + 5)).map(_ => Utils.randomPoint(Client.dims))
-      .map { case Point(y, x) => Obstacle(y, x, 0.15) }.toList
-    val startPoints = randomStartPoints(obstacles)
-    start = startPoints._1
-    finish = startPoints._2
-
-    redraw()
-  }
+  private val canvas = createCanvas()
+  private val context = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
 
   def redraw(): Unit = {
-    val tileHeight = canvas.height / dims.y
-    val tileWidth = canvas.width / dims.x
+    val tileHeight = canvas.height / clientSettings.dims.y
+    val tileWidth = canvas.width / clientSettings.dims.x
     clearCanvas()
     redrawObstacles(tileHeight, tileWidth)
     redrawStartAndFinish(tileHeight, tileWidth)
   }
 
   def draw(result: Result): Unit = {
-    val tileHeight = canvas.height / dims.y
-    val tileWidth = canvas.width / dims.x
+    val tileHeight = canvas.height / clientSettings.dims.y
+    val tileWidth = canvas.width / clientSettings.dims.x
     clearCanvas()
     redrawPatches(tileHeight, tileWidth, result)
     redrawObstacles(tileHeight, tileWidth)
@@ -81,23 +47,23 @@ object CanvasWorker {
     redrawStartAndFinish(tileHeight, tileWidth)
   }
 
-  def clearCanvas(): Unit = {
+  private def clearCanvas(): Unit = {
     context.fillStyle = backgroundColor
     context.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  def redrawObstacles(tileHeight: Double, tileWidth: Double): Unit = {
+  private def redrawObstacles(tileHeight: Double, tileWidth: Double): Unit = {
     context.strokeStyle = "black"
     context.lineWidth = 1.0
 
-    obstacles.foreach { case Obstacle(y, x, r) =>
+    clientSettings.obstacles.foreach { case Obstacle(y, x, r) =>
       context.beginPath
       context.arc(x * tileWidth, y * tileHeight, r * tileWidth, 0, 2.0 * Math.PI)
       context.stroke
     }
   }
 
-  def redrawPaths(tileHeight: Double, tileWidth: Double, result: Result): Unit = {
+  private def redrawPaths(tileHeight: Double, tileWidth: Double, result: Result): Unit = {
     context.lineWidth = 6.0
     redrawPath(result.roughPath, tileWidth, tileHeight, pathColor)
 
@@ -116,7 +82,7 @@ object CanvasWorker {
     }
   }
 
-  def redrawPathWithAngles(path: PathWithAngles, tileWidth: Double, tileHeight: Double, color: String): Unit = {
+  private def redrawPathWithAngles(path: PathWithAngles, tileWidth: Double, tileHeight: Double, color: String): Unit = {
     if (path.path.nonEmpty) {
       context.strokeStyle = color
       context.beginPath()
@@ -126,8 +92,6 @@ object CanvasWorker {
       }
       context.stroke()
 
-      val pathStep = InputCollector.inputs.pathStep.value.toDouble
-      val angleOfSearch = InputCollector.inputs.angleOfSearch.value.toDouble
       path.path.foreach { case PointWithAngle(Point(y, x), angle) =>
         //        context.fillStyle = "black"
         //        context.fillCircle(x * tileWidth, y * tileHeight, 3.0)
@@ -135,8 +99,8 @@ object CanvasWorker {
         context.fillStyle = "rgba(139,69,19,0.25)"
         context.beginPath()
         context.moveTo(x * tileWidth, y * tileHeight)
-        context.arc(x * tileWidth, y * tileHeight, pathStep * tileWidth,
-          Math.toRadians(angle - angleOfSearch), Math.toRadians(angle + angleOfSearch))
+        context.arc(x * tileWidth, y * tileHeight, path.pathStep * tileWidth,
+          Math.toRadians(angle - path.angleOfSearch), Math.toRadians(angle + path.angleOfSearch))
         context.fill()
       }
     }
@@ -159,7 +123,7 @@ object CanvasWorker {
     }
   }
 
-  def redrawPatches(tileHeight: Double, tileWidth: Double, result: Result) = {
+  private def redrawPatches(tileHeight: Double, tileWidth: Double, result: Result): Unit = {
     result.patches.foreach { patch =>
       context.strokeStyle = obstaclesColor
       context.fillStyle = obstaclesBackgroundColor
@@ -174,12 +138,12 @@ object CanvasWorker {
     }
   }
 
-  def redrawStartAndFinish(tileHeight: Double, tileWidth: Double) = {
+  private def redrawStartAndFinish(tileHeight: Double, tileWidth: Double): Unit = {
     context.strokeStyle = "black"
     context.lineWidth = 2.0
     context.font = "50px Arial Black"
-    context.strokeText("x", start.x * tileHeight - 15, start.y * tileWidth + 10)
-    context.strokeText("x", finish.x * tileHeight - 15, finish.y * tileWidth + 10)
+    context.strokeText("s", clientSettings.start.x * tileWidth - 15, clientSettings.start.y * tileHeight + 10)
+    context.strokeText("f", clientSettings.finish.x * tileWidth - 15, clientSettings.finish.y * tileHeight + 10)
   }
 
 }

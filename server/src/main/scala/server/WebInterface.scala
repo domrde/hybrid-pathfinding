@@ -8,9 +8,10 @@ import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 import common.CommonObjects._
+import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
+import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success, Try}
 
 object Protocols extends DefaultJsonProtocol {
@@ -21,7 +22,7 @@ object Protocols extends DefaultJsonProtocol {
 
   implicit val pointWithAngleFormat: RootJsonFormat[PointWithAngle] = jsonFormat2(PointWithAngle)
   implicit val pathFormat: RootJsonFormat[Path] = jsonFormat2(Path)
-  implicit val pathWithAnglesFormat: RootJsonFormat[PathWithAngles] = jsonFormat2(PathWithAngles)
+  implicit val pathWithAnglesFormat: RootJsonFormat[PathWithAngles] = jsonFormat4(PathWithAngles)
   implicit val exampleFormat: RootJsonFormat[Example] = jsonFormat4(Example)
   implicit val nodeFormat: RootJsonFormat[MapPatch] = jsonFormat4(MapPatch)
   implicit val resultFormat: RootJsonFormat[Result] = jsonFormat4(Result)
@@ -30,9 +31,9 @@ object Protocols extends DefaultJsonProtocol {
 object WebInterface extends App {
   import Protocols._
 
-  implicit val system = ActorSystem()
-  implicit val executor = system.dispatcher
-  implicit val materializer = ActorMaterializer()
+  implicit val system: ActorSystem = ActorSystem()
+  implicit val executor: ExecutionContextExecutor = system.dispatcher
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   val config = ConfigFactory.load()
   val logger = Logging(system, getClass)

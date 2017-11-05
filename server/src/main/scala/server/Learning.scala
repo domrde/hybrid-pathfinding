@@ -2,10 +2,10 @@ package server
 
 import java.util.concurrent.Executors
 
-import libsvm._
-import libsvm.svm_parameter._
 import common.CommonObjects
 import common.CommonObjects._
+import libsvm._
+import libsvm.svm_parameter._
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
@@ -196,7 +196,7 @@ object Learning {
 
   def smoothPath(configuration: Configuration, roughPath: Path): (PathWithAngles, List[Example]) = {
     if (roughPath.path.size < 2) {
-      (PathWithAngles(List.empty, "black"), List.empty)
+      (PathWithAngles(List.empty, "black", 0.0, 0.0), List.empty)
     } else {
       val height = configuration.dims.y
       val width = configuration.dims.x
@@ -241,7 +241,7 @@ object Learning {
           .filter(_.paths.nonEmpty)
           .flatMap { runResults =>
             runResults.paths.map { points =>
-              PathWithAngles(points, s"orange")
+              PathWithAngles(points, "orange", configuration.settings.pathStep, configuration.settings.angleOfSearch)
             }
           }
           .filter(checkPathCorrect(inRanges, roughPath.path, configuration, 3.0))
@@ -249,7 +249,9 @@ object Learning {
       val path =
         if (paths.nonEmpty) {
           paths.minBy(path => path.path.sliding(2).map { case a :: b :: Nil => distance(a.p, b.p) }.sum)
-        } else PathWithAngles(List.empty, "white")
+        } else {
+          PathWithAngles(List.empty, "white", configuration.settings.pathStep, configuration.settings.angleOfSearch)
+        }
 
       (path, inRanges)
     }
