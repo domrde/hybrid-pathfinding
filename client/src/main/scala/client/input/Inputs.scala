@@ -23,4 +23,5 @@ class Inputs {
   def cost: Input = dom.document.getElementById("costInput").asInstanceOf[Input]
   def eps: Input = dom.document.getElementById("epsInput").asInstanceOf[Input]
 
+  def inputs: List[Input] = List(calculationTimeout, angleOfSearch, pathStep, deltaToFinish, gamma, cost, eps)
 }

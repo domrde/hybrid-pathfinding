@@ -19,6 +19,7 @@ class ServerCommunicator(clientSettings: ClientSettings, inputCollector: InputCo
     Ajax.post(
       url = "http://localhost:8080/pathfind",
       data = upickle.default.write(configuration),
+      timeout = settings.calculationTimeout,
       headers = Map("Content-Type" -> "application/json")
     ).onComplete {
       case Success(value) if value.status == 200 =>

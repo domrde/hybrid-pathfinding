@@ -43,10 +43,10 @@
                         <div class="col">
                         </div>
                         <div class="col-3">
-                            Seconds to wait result:
+                            Milliseconds to wait result:
                         </div>
                         <div class="col-1">
-                            <input type="number" id="calculationTimeout" min="1" max="20" value="1">
+                            <input width="100%" type="number" id="calculationTimeout" min="10" max="20000" value="1000">
                         </div>
                         <div class="col">
                             <input type="button" id="submit" value="Submit">
@@ -66,7 +66,7 @@
                                 <span class="input-group-addon" style="width: 25%;">Angle</span>
                                 <input type="range" id="angleOfSearchInput" value="70" min="1"
                                        max="180"
-                                       oninput="angleOfSearchOutput.value = angleOfSearchInput.value + '°'">
+                                       onchange="angleOfSearchOutput.value = angleOfSearchInput.value + '°'">
                                 <span class="input-group-addon" style="width: 20%;"><output
                                         id="angleOfSearchOutput">70°</output></span>
                             </div>
@@ -79,7 +79,7 @@
                                 <span class="input-group-addon" style="width: 25%;">Step</span>
                                 <input type="range" id="pathStepInput" value="0.35" min="0.1"
                                        max="5.0" step="0.01"
-                                       oninput="pathStepOutput.value = pathStepInput.value">
+                                       onchange="pathStepOutput.value = pathStepInput.value">
                                 <span class="input-group-addon" style="width: 20%;"><output
                                         id="pathStepOutput">0.35</output></span>
                             </div>
@@ -92,9 +92,9 @@
                                 <span class="input-group-addon" style="width: 25%;">Delta</span>
                                 <input type="range" id="deltaToFinishInput" value="1.0" min="0.1"
                                        max="5.0" step="0.01"
-                                       oninput="deltaToFinishOutput.value = deltaToFinishInput.value">
+                                       onchange="deltaToFinishOutput.value = deltaToFinishInput.value">
                                 <span class="input-group-addon" style="width: 20%;"><output
-                                        id="deltaToFinishOutput">1.0</output></span>
+                                        id="deltaToFinishOutput">1</output></span>
                             </div>
                         </div>
                     </div>
@@ -137,7 +137,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" style="width: 25%;">Gamma</span>
                                 <input type="range" id="gammaInput" value="0" min="-13" max="13" step="1"
-                                       oninput="gammaOutput.value = '2e^' + gammaInput.value">
+                                       onchange="gammaOutput.value = '2e^' + gammaInput.value">
                                 <span class="input-group-addon" style="width: 20%;"><output
                                         id="gammaOutput">2e^0</output></span>
                             </div>
@@ -149,7 +149,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" style="width: 25%;">Cost</span>
                                 <input type="range" id="costInput" value="11" min="-13" max="13" step="1"
-                                       oninput="costOutput.value = costInput.value">
+                                       onchange="costOutput.value = '2e^' + costInput.value">
                                 <span class="input-group-addon" style="width: 20%;"><output
                                         id="costOutput">2e^11</output></span>
                             </div>
@@ -161,7 +161,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" style="width: 25%;">Eps</span>
                                 <input type="range" id="epsInput" value="-1" min="-13" max="13" step="1"
-                                       oninput="epsOutput.value = epsInput.value">
+                                       onchange="epsOutput.value = '2e^' + epsInput.value">
                                 <span class="input-group-addon" style="width: 20%;"><output
                                         id="epsOutput">2e^-1</output></span>
                             </div>

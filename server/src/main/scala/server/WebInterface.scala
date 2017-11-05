@@ -6,12 +6,14 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.StandardRoute
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import common.CommonObjects._
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success, Try}
 
 object Protocols extends DefaultJsonProtocol {
@@ -29,6 +31,7 @@ object Protocols extends DefaultJsonProtocol {
 }
 
 object WebInterface extends App {
+
   import Protocols._
 
   implicit val system: ActorSystem = ActorSystem()
@@ -56,23 +59,33 @@ object WebInterface extends App {
     } ~ post {
       path("pathfind") {
         entity(as[Configuration]) { configuration =>
-          print("Calculating... ")
-          Try {
-            time {
-              Pathfinder.findPath(configuration)
-            }
-          } match {
-            case Failure(exception) =>
-              println("Failure")
-              exception.printStackTrace()
-              complete(HttpResponse(StatusCodes.InternalServerError))
-
-            case Success(value) =>
-              println("Done")
-              complete(value)
+          limitExecutionTime(configuration.settings.calculationTimeout) {
+            calculatePath(configuration)
           }
         }
       }
+    }
+  }
+
+  def limitExecutionTime[R](timeoutMillis: Int)(block: => R): R = {
+    Await.result(Future(block), timeoutMillis.millis)
+  }
+
+  def calculatePath(configuration: Configuration): StandardRoute = {
+    print("Calculating... ")
+    Try {
+      time {
+        Pathfinder.findPath(configuration)
+      }
+    } match {
+      case Failure(exception) =>
+        println("Failure")
+        exception.printStackTrace()
+        complete(HttpResponse(StatusCodes.InternalServerError))
+
+      case Success(value) =>
+        println("Done")
+        complete(value)
     }
   }
 
