@@ -15,3 +15,6 @@ Usage:
 ```sbt server/run```
 
 - Open page in browser on ```localhost:8080```.
+
+---
+Uses LIBSVM library from https://www.csie.ntu.edu.tw/~cjlin/libsvm/
